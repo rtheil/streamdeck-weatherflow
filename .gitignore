@@ -1,0 +1,6 @@
+node_modules/
+dist/
+com.ricky.weatherflow.sdPlugin/bin/
+*.streamDeckPlugin
+*.log
+.DS_Store

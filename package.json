@@ -1,0 +1,30 @@
+{
+  "name": "com.ricky.weatherflow",
+  "version": "1.0.0",
+  "description": "WeatherFlow Tempest weather station for Stream Deck",
+  "author": "Ricky Theil",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c --environment NODE_ENV:production",
+    "deploy": "npm run build && node scripts/deploy.js",
+    "watch": "rollup -c -w",
+    "create-icons": "node scripts/create-icons.js",
+    "validate": "streamdeck validate com.ricky.weatherflow.sdPlugin",
+    "pack": "npm run build && streamdeck pack com.ricky.weatherflow.sdPlugin --force"
+  },
+  "dependencies": {
+    "@elgato/streamdeck": "^1.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/node": "^20.0.0",
+    "rollup": "^4.0.0",
+    "sharp": "^0.34.5",
+    "tslib": "^2.6.0",
+    "typescript": "^5.0.0"
+  }
+}

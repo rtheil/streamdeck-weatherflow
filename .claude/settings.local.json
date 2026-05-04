@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:weatherflow.github.io)",
+      "WebFetch(domain:docs.elgato.com)",
+      "WebFetch(domain:apidocs.tempestwx.com)",
+      "WebFetch(domain:community.tempest.earth)",
+      "WebFetch(domain:hexdocs.pm)",
+      "Bash(npm install:*)",
+      "Bash(cmd.exe /c \"where node 2>&1 && where npm 2>&1\")",
+      "Bash(cmd.exe /c \"where node\")",
+      "Bash(cmd.exe /c \"where npm\")",
+      "Bash(xargs grep:*)",
+      "Bash(npm run:*)",
+      "Bash(cmd /c \"npm run deploy\")",
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\Ricky\\\\source\\\\repos\\\\Personal\\\\StreamDeck_WeatherFlow && npm run deploy\")",
+      "Bash(powershell -Command \"Set-Location ''C:\\\\Users\\\\Ricky\\\\source\\\\repos\\\\Personal\\\\StreamDeck_WeatherFlow''; npm run deploy\")",
+      "Bash(powershell -Command \"$Env:PATH = $Env:PATH + '';C:\\\\Program Files\\\\nodejs''; Set-Location ''C:\\\\Users\\\\Ricky\\\\source\\\\repos\\\\Personal\\\\StreamDeck_WeatherFlow''; & npm run deploy\")",
+      "Bash(\"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" --version)",
+      "Bash(\"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" run deploy)",
+      "Bash(\"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" run build)",
+      "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" \"node_modules\\\\rollup\\\\dist\\\\bin\\\\rollup\" -c --environment NODE_ENV:production)",
+      "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" scripts/deploy.js)",
+      "Bash(powershell -Command \"Get-ChildItem ''C:\\\\Users\\\\Ricky\\\\AppData\\\\Roaming\\\\Elgato\\\\StreamDeck\\\\logs'' | Sort-Object LastWriteTime -Descending | Select-Object -First 5 | Format-Table Name, LastWriteTime\")",
+      "Bash(npx --yes @elgato/cli@latest validate com.ricky.weatherflow.sdPlugin)"
+    ]
+  }
+}

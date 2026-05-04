@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>WeatherFlow Tempest Settings</title>
+  <style>
+    :root {
+      --bg: #2d2d2d;
+      --input-bg: #1a1a1a;
+      --text: #cccccc;
+      --label: #8f8f8f;
+      --border: #444444;
+      --accent: #0078d4;
+      --section-color: #666;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      margin: 0;
+      padding: 8px;
+    }
+
+    h3 {
+      color: var(--section-color);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 14px 0 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h3:first-of-type { margin-top: 4px; }
+
+    .row {
+      display: flex;
+      align-items: center;
+      margin: 5px 0;
+      gap: 8px;
+    }
+
+    label {
+      color: var(--label);
+      min-width: 110px;
+      flex-shrink: 0;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    select {
+      flex: 1;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text);
+      padding: 4px 7px;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    select option { background: var(--input-bg); }
+
+    .hint {
+      color: var(--section-color);
+      font-size: 10px;
+      margin: 4px 0 0 118px;
+      line-height: 1.4;
+    }
+
+    .hint a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    #status {
+      margin-top: 10px;
+      padding: 5px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      display: none;
+    }
+
+    #status.ok  { background: #1a3a1a; color: #6dbf6d; border: 1px solid #3a6a3a; display: block; }
+    #status.err { background: #3a1a1a; color: #bf6d6d; border: 1px solid #6a3a3a; display: block; }
+  </style>
+</head>
+<body>
+
+  <h3>Station Settings (Global)</h3>
+
+  <div class="row">
+    <label for="apiToken">API Token</label>
+    <input type="password" id="apiToken" placeholder="Paste your Tempest token" autocomplete="off" />
+  </div>
+  <p class="hint">
+    Get your token at
+    <a href="#" onclick="openLink('https://tempestwx.com/settings/tokens')">tempestwx.com &rarr; Settings &rarr; Data Authorizations</a>
+  </p>
+
+  <div class="row">
+    <label for="stationId">Station ID</label>
+    <input type="text" id="stationId" placeholder="e.g. 123456" />
+  </div>
+  <p class="hint">Find your station ID in the Tempest app or on the web app URL.</p>
+
+  <h3>This Button</h3>
+
+  <div class="row">
+    <label for="metric">Display</label>
+    <select id="metric">
+      <option value="temperature">Temperature</option>
+      <option value="feels_like">Feels Like</option>
+      <option value="humidity">Humidity</option>
+      <option value="dew_point">Dew Point</option>
+      <option value="wind">Wind Speed &amp; Direction</option>
+      <option value="wind_gust">Wind Gust</option>
+      <option value="pressure">Barometric Pressure</option>
+      <option value="uv">UV Index</option>
+      <option value="solar">Solar Radiation</option>
+      <option value="precipitation">Precipitation Today</option>
+      <option value="lightning">Lightning (last 1hr)</option>
+      <option value="thp">Temp / Humidity / Pressure</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <label for="units">Units</label>
+    <select id="units">
+      <option value="imperial">Imperial (&deg;F, mph, inHg, in)</option>
+      <option value="metric">Metric (&deg;C, m/s, hPa, mm)</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <label for="refreshInterval">Refresh Every</label>
+    <select id="refreshInterval">
+      <option value="1">1 minute</option>
+      <option value="2">2 minutes</option>
+      <option value="5" selected>5 minutes</option>
+      <option value="10">10 minutes</option>
+      <option value="15">15 minutes</option>
+      <option value="30">30 minutes</option>
+    </select>
+  </div>
+
+  <div id="status"></div>
+
+<script>
+  /* global connectElgatoStreamDeckSocket */
+
+  let websocket = null;
+  let uuid = null;
+  let debounceTimer = null;
+
+  function showStatus(msg, isError) {
+    const el = document.getElementById("status");
+    el.textContent = msg;
+    el.className = isError ? "err" : "ok";
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => { el.className = ""; }, 4000);
+  }
+
+  function send(obj) {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+      websocket.send(JSON.stringify(obj));
+    }
+  }
+
+  function saveSettings() {
+    send({
+      event: "setSettings",
+      context: uuid,
+      payload: {
+        metric: document.getElementById("metric").value,
+        units: document.getElementById("units").value,
+        refreshInterval: parseInt(document.getElementById("refreshInterval").value, 10),
+      },
+    });
+  }
+
+  function saveGlobalSettings() {
+    send({
+      event: "setGlobalSettings",
+      context: uuid,
+      payload: {
+        token: document.getElementById("apiToken").value.trim(),
+        stationId: document.getElementById("stationId").value.trim(),
+      },
+    });
+    showStatus("Station settings saved.", false);
+  }
+
+  function openLink(url) {
+    send({ event: "openUrl", payload: { url } });
+  }
+
+  function applySettings(settings) {
+    if (!settings) return;
+    if (settings.metric) document.getElementById("metric").value = settings.metric;
+    if (settings.units) document.getElementById("units").value = settings.units;
+    if (settings.refreshInterval) {
+      document.getElementById("refreshInterval").value = String(settings.refreshInterval);
+    }
+  }
+
+  function applyGlobalSettings(gs) {
+    if (!gs) return;
+    if (gs.token) document.getElementById("apiToken").value = gs.token;
+    if (gs.stationId) document.getElementById("stationId").value = gs.stationId;
+  }
+
+  // Stream Deck calls this function when loading the Property Inspector
+  function connectElgatoStreamDeckSocket(port, propertyInspectorUUID, registerEvent, _info, actionInfo) {
+    uuid = propertyInspectorUUID;
+
+    try {
+      const parsed = JSON.parse(actionInfo);
+      applySettings(parsed?.payload?.settings);
+    } catch (_) { /* ignore */ }
+
+    websocket = new WebSocket(`ws://127.0.0.1:${port}`);
+
+    websocket.onopen = () => {
+      send({ event: registerEvent, uuid: propertyInspectorUUID });
+      send({ event: "getSettings", context: propertyInspectorUUID });
+      send({ event: "getGlobalSettings", context: propertyInspectorUUID });
+    };
+
+    websocket.onmessage = (evt) => {
+      try {
+        const msg = JSON.parse(evt.data);
+        if (msg.event === "didReceiveSettings") {
+          applySettings(msg.payload?.settings);
+        } else if (msg.event === "didReceiveGlobalSettings") {
+          applyGlobalSettings(msg.payload?.settings);
+        }
+      } catch (_) { /* ignore */ }
+    };
+  }
+
+  document.getElementById("metric").addEventListener("change", saveSettings);
+  document.getElementById("units").addEventListener("change", saveSettings);
+  document.getElementById("refreshInterval").addEventListener("change", saveSettings);
+
+  let globalDebounce = null;
+  function debouncedSaveGlobal() {
+    clearTimeout(globalDebounce);
+    globalDebounce = setTimeout(saveGlobalSettings, 600);
+  }
+  document.getElementById("apiToken").addEventListener("input", debouncedSaveGlobal);
+  document.getElementById("stationId").addEventListener("input", debouncedSaveGlobal);
+</script>
+
+</body>
+</html>

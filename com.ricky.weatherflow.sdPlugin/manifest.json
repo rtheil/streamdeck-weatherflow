@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "Name": "WeatherFlow Tempest",
+  "Author": "Ricky Theil",
+  "Description": "Unofficial plugin for WeatherFlow Tempest weather stations. Display live weather data on Stream Deck buttons.",
+  "UUID": "com.ricky.weatherflow",
+  "Version": "1.0.0.0",
+  "SDKVersion": 2,
+  "CodePath": "bin/plugin.js",
+  "Icon": "imgs/plugin-icon",
+  "Category": "WeatherFlow Tempest",
+  "CategoryIcon": "imgs/category-icon",
+  "URL": "https://github.com/rtheil/streamdeck-weatherflow",
+  "Software": {
+    "MinimumVersion": "6.6"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    },
+    {
+      "Platform": "mac",
+      "MinimumVersion": "13"
+    }
+  ],
+  "Nodejs": {
+    "Version": "20",
+    "Debug": "enabled"
+  },
+  "Actions": [
+    {
+      "Name": "Weather Display",
+      "UUID": "com.ricky.weatherflow.weatherdisplay",
+      "Icon": "imgs/action-icon",
+      "PropertyInspectorPath": "ui/weather-display.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Shows a configurable weather metric from your Tempest station",
+      "States": [
+        {
+          "Image": "imgs/action-state",
+          "Title": "",
+          "TitleAlignment": "middle",
+          "FontSize": 12,
+          "FontUnderline": false,
+          "ShowTitle": true
+        }
+      ]
+    }
+  ]
+}
