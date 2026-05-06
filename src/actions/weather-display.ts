@@ -164,7 +164,7 @@ function formatMetric(
   }
 }
 
-@action({ UUID: "com.ricky.weatherflow.weatherdisplay" })
+@action({ UUID: "com.rtheil.weatherflow.weatherdisplay" })
 export class WeatherDisplay extends SingletonAction<Settings> {
   private readonly activeActions = new Map<string, AnyAction>();
   private readonly timers = new Map<string, ReturnType<typeof setInterval>>();

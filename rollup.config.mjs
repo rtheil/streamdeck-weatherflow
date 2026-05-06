@@ -6,7 +6,7 @@ import path from "node:path";
 import url from "node:url";
 
 const isWatching = !!process.env.ROLLUP_WATCH;
-const sdPlugin = "com.ricky.weatherflow.sdPlugin";
+const sdPlugin = "com.rtheil.weatherflow.sdPlugin";
 
 export default {
   input: "src/plugin.ts",

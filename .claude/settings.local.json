@@ -23,7 +23,8 @@
       "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" \"node_modules\\\\rollup\\\\dist\\\\bin\\\\rollup\" -c --environment NODE_ENV:production)",
       "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" scripts/deploy.js)",
       "Bash(powershell -Command \"Get-ChildItem ''C:\\\\Users\\\\Ricky\\\\AppData\\\\Roaming\\\\Elgato\\\\StreamDeck\\\\logs'' | Sort-Object LastWriteTime -Descending | Select-Object -First 5 | Format-Table Name, LastWriteTime\")",
-      "Bash(npx --yes @elgato/cli@latest validate com.ricky.weatherflow.sdPlugin)"
+      "Bash(npx --yes @elgato/cli@latest validate com.ricky.weatherflow.sdPlugin)",
+      "Bash(git mv *)"
     ]
   }
 }

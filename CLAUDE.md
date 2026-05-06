@@ -7,13 +7,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm install
 npm run create-icons   # generate placeholder PNGs (only needed once or after icon changes)
-npm run build          # production build via Rollup → com.ricky.weatherflow.sdPlugin/bin/plugin.js
+npm run build          # production build via Rollup → com.rtheil.weatherflow.sdPlugin/bin/plugin.js
 npm run watch          # dev mode — rebuilds on file changes with source maps
 ```
 
 No test runner or linter is configured.
 
-To sideload, copy `com.ricky.weatherflow.sdPlugin/` to the Stream Deck plugins directory and restart Stream Deck.
+To sideload, copy `com.rtheil.weatherflow.sdPlugin/` to the Stream Deck plugins directory and restart Stream Deck.
 
 ## Architecture
 
@@ -33,7 +33,7 @@ The plugin uses a **two-tier settings model**: global settings (API token, stati
 
 ## Key identifiers
 
-- Plugin UUID: `com.ricky.weatherflow`
-- Action UUID: `com.ricky.weatherflow.weatherdisplay`
+- Plugin UUID: `com.rtheil.weatherflow`
+- Action UUID: `com.rtheil.weatherflow.weatherdisplay`
 - WeatherFlow REST base: `https://swd.weatherflow.com/swd/rest`
 - All API values arrive in metric; the plugin converts to imperial when the user selects it.

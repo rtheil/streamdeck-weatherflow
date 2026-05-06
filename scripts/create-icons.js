@@ -13,12 +13,46 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
-const imgDir = join(root, "com.ricky.weatherflow.sdPlugin", "imgs");
+const imgDir = join(root, "com.rtheil.weatherflow.sdPlugin", "imgs");
 
 if (!existsSync(imgDir)) mkdirSync(imgDir, { recursive: true });
 
 const PURPLE = "#9B59B6"; // visible against black; close-ish to Tempest brand purple
 const BG = "#000000";
+
+function makeBannerSvg(width = 1920, height = 960) {
+  const pad = 120;
+  const iconBox = height - pad * 2;
+  const innerPad = Math.round(iconBox * 0.12);
+  const innerSize = iconBox - innerPad * 2;
+  const radius = Math.round(innerSize * 0.18);
+  const stroke = Math.max(4, Math.round(iconBox * 0.045));
+  const iconFont = Math.round(innerSize * 0.62);
+
+  const textX = pad + iconBox + pad;
+  const titleSize = 130;
+  const tagSize = 56;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <rect width="${width}" height="${height}" fill="${BG}"/>
+  <g transform="translate(${pad}, ${pad})">
+    <rect x="${innerPad}" y="${innerPad}" width="${innerSize}" height="${innerSize}"
+          rx="${radius}" ry="${radius}"
+          fill="none" stroke="${PURPLE}" stroke-width="${stroke}"/>
+    <text x="${iconBox / 2}" y="${iconBox / 2 + iconFont * 0.05}"
+          text-anchor="middle" dominant-baseline="middle"
+          font-family="Arial, Helvetica, sans-serif"
+          font-weight="700" font-size="${iconFont}"
+          fill="${PURPLE}">T°</text>
+  </g>
+  <text x="${textX}" y="380" font-family="Arial, Helvetica, sans-serif"
+        font-weight="700" font-size="${titleSize}" fill="${PURPLE}">WeatherFlow</text>
+  <text x="${textX}" y="520" font-family="Arial, Helvetica, sans-serif"
+        font-weight="700" font-size="${titleSize}" fill="${PURPLE}">Tempest</text>
+  <text x="${textX}" y="620" font-family="Arial, Helvetica, sans-serif"
+        font-weight="400" font-size="${tagSize}" fill="#cccccc">Live weather on your Stream Deck</text>
+</svg>`;
+}
 
 function makeSvg(size, { branded = true } = {}) {
   if (!branded) {
@@ -73,8 +107,13 @@ for (const { base, sizes, branded } of iconSpecs) {
   await renderPng(s2x, join(imgDir, `${base}.png`), opts);
 }
 
-// Marketplace listing tile (288×288).
-await renderPng(288, join(imgDir, "marketplace-tile.png"), { branded: true });
+// Marketplace listing thumbnail (1920×960, 2:1).
+{
+  const svg = makeBannerSvg(1920, 960);
+  const outPath = join(imgDir, "marketplace-thumbnail.png");
+  await sharp(Buffer.from(svg)).png().toFile(outPath);
+  console.log(`Created marketplace-thumbnail.png (1920×960)`);
+}
 
 console.log("\nDone! Edit PURPLE/BG constants or the SVG in this script to tweak.");
-console.log("Output: com.ricky.weatherflow.sdPlugin/imgs/");
+console.log("Output: com.rtheil.weatherflow.sdPlugin/imgs/");

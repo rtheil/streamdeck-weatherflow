@@ -10,7 +10,7 @@ import { execSync } from "node:child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
-const pluginId = "com.ricky.weatherflow.sdPlugin";
+const pluginId = "com.rtheil.weatherflow.sdPlugin";
 const src = join(root, pluginId);
 
 const appData = process.env.APPDATA;
@@ -35,7 +35,7 @@ cpSync(src, dest, {
 
 // Restart just the plugin process (requires @elgato/cli to be installed).
 try {
-  execSync("streamdeck restart com.ricky.weatherflow", { stdio: "inherit" });
+  execSync("streamdeck restart com.rtheil.weatherflow", { stdio: "inherit" });
   console.log("Plugin restarted.");
 } catch {
   console.log("Done. Restart Stream Deck to pick up the changes.");

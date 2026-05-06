@@ -3,16 +3,16 @@
   "Name": "WeatherFlow Tempest",
   "Author": "Ricky Theil",
   "Description": "Unofficial plugin for WeatherFlow Tempest weather stations. Display live weather data on Stream Deck buttons.",
-  "UUID": "com.ricky.weatherflow",
-  "Version": "1.0.0.0",
-  "SDKVersion": 2,
+  "UUID": "com.rtheil.weatherflow",
+  "Version": "1.0.1.0",
+  "SDKVersion": 3,
   "CodePath": "bin/plugin.js",
   "Icon": "imgs/plugin-icon",
   "Category": "WeatherFlow Tempest",
   "CategoryIcon": "imgs/category-icon",
   "URL": "https://github.com/rtheil/streamdeck-weatherflow",
   "Software": {
-    "MinimumVersion": "6.6"
+    "MinimumVersion": "6.9"
   },
   "OS": [
     {
@@ -31,7 +31,7 @@
   "Actions": [
     {
       "Name": "Weather Display",
-      "UUID": "com.ricky.weatherflow.weatherdisplay",
+      "UUID": "com.rtheil.weatherflow.weatherdisplay",
       "Icon": "imgs/action-icon",
       "PropertyInspectorPath": "ui/weather-display.html",
       "SupportedInMultiActions": true,
