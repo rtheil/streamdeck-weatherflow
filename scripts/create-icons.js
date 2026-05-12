@@ -2,12 +2,20 @@
  * Generates the plugin's icon set.
  * Run with: npm run create-icons
  *
- * Design: black background, rounded-corner purple-bordered square with "T°"
- * lettering inside, also in purple.
+ * Three icon families:
+ *   1. plugin-icon  — shown in the plugin browser / Marketplace listing.
+ *                     Branded: black background, purple T° tile. PNG only (required).
+ *   2. action-state — the live button background. Plain black so overlaid title
+ *                     text (the actual weather value) is readable.
+ *   3. action-icon, category-icon — shown in the action list inside the
+ *                     Stream Deck app. Must be monochrome white on transparent
+ *                     per Elgato guidelines. SVG (scales cleanly at small sizes).
+ *
+ * Plus a Marketplace listing banner at 1920×960.
  */
 
 import sharp from "sharp";
-import { mkdirSync, existsSync } from "node:fs";
+import { mkdirSync, existsSync, writeFileSync, unlinkSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -17,8 +25,56 @@ const imgDir = join(root, "com.rtheil.weatherflow.sdPlugin", "imgs");
 
 if (!existsSync(imgDir)) mkdirSync(imgDir, { recursive: true });
 
-const PURPLE = "#9B59B6"; // visible against black; close-ish to Tempest brand purple
+const PURPLE = "#9B59B6";
 const BG = "#000000";
+
+// ---------- Branded plugin icon (color, PNG, opaque background) ----------
+
+function makeBrandedSvg(size) {
+  const padding = Math.round(size * 0.12);
+  const frameSize = size - padding * 2;
+  const radius = Math.round(frameSize * 0.18);
+  const stroke = Math.max(2, Math.round(size * 0.045));
+  const fontSize = Math.round(frameSize * 0.62);
+  const textY = size * 0.5 + fontSize * 0.05;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+  <rect width="${size}" height="${size}" fill="${BG}"/>
+  <rect x="${padding}" y="${padding}" width="${frameSize}" height="${frameSize}"
+        rx="${radius}" ry="${radius}"
+        fill="none" stroke="${PURPLE}" stroke-width="${stroke}"/>
+  <text x="50%" y="${textY}"
+        text-anchor="middle" dominant-baseline="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-weight="700" font-size="${fontSize}"
+        fill="${PURPLE}">T°</text>
+</svg>`;
+}
+
+// ---------- Plain black tile for action-state ----------
+
+function makePlainBlackSvg(size) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+  <rect width="${size}" height="${size}" fill="${BG}"/>
+</svg>`;
+}
+
+// ---------- White monochrome icon for action list (SVG, transparent bg) ----------
+
+function makeMonochromeSvg() {
+  // Designed in a 100×100 viewBox so it scales cleanly to any rendered size.
+  // Note: no background rect — the SVG canvas stays transparent.
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <rect x="12" y="12" width="76" height="76" rx="14" ry="14"
+        fill="none" stroke="#FFFFFF" stroke-width="6"/>
+  <text x="50" y="50"
+        text-anchor="middle" dominant-baseline="central"
+        font-family="Arial, Helvetica, sans-serif"
+        font-weight="700" font-size="46"
+        fill="#FFFFFF">T°</text>
+</svg>`;
+}
+
+// ---------- Marketplace banner ----------
 
 function makeBannerSvg(width = 1920, height = 960) {
   const pad = 120;
@@ -54,66 +110,47 @@ function makeBannerSvg(width = 1920, height = 960) {
 </svg>`;
 }
 
-function makeSvg(size, { branded = true } = {}) {
-  if (!branded) {
-    // Plain black tile — used for action-state (the live button background)
-    // so the overlaid title text (temperature, etc.) reads cleanly.
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <rect width="${size}" height="${size}" fill="${BG}"/>
-</svg>`;
-  }
+// ---------- Render ----------
 
-  const padding = Math.round(size * 0.12);
-  const frameSize = size - padding * 2;
-  const radius = Math.round(frameSize * 0.18);
-  const stroke = Math.max(2, Math.round(size * 0.045));
-  const fontSize = Math.round(frameSize * 0.62);
-  // Nudge baseline slightly above true center — looks more balanced with the
-  // degree symbol sitting up high.
-  const textY = size * 0.5 + fontSize * 0.05;
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <rect width="${size}" height="${size}" fill="${BG}"/>
-  <rect x="${padding}" y="${padding}" width="${frameSize}" height="${frameSize}"
-        rx="${radius}" ry="${radius}"
-        fill="none" stroke="${PURPLE}" stroke-width="${stroke}"/>
-  <text x="50%" y="${textY}"
-        text-anchor="middle" dominant-baseline="middle"
-        font-family="Arial, Helvetica, sans-serif"
-        font-weight="700" font-size="${fontSize}"
-        fill="${PURPLE}">T°</text>
-</svg>`;
-}
-
-async function renderPng(size, outPath, opts) {
-  const svg = makeSvg(size, opts);
+async function renderPng(svg, outPath, label) {
   await sharp(Buffer.from(svg)).png().toFile(outPath);
-  console.log(`Created ${outPath.split(/[\\/]/).pop()} (${size}px)`);
+  console.log(`Created ${outPath.split(/[\\/]/).pop()} (${label})`);
 }
 
-const iconSpecs = [
-  { base: "plugin-icon",   sizes: [72, 144], branded: true },
-  { base: "action-icon",   sizes: [72, 144], branded: true },
-  { base: "action-state",  sizes: [72, 144], branded: false },
-  { base: "category-icon", sizes: [28, 56],  branded: true },
-];
+function writeSvg(svg, outPath) {
+  writeFileSync(outPath, svg);
+  console.log(`Created ${outPath.split(/[\\/]/).pop()} (SVG)`);
+}
 
-for (const { base, sizes, branded } of iconSpecs) {
-  const [s1x, s2x] = sizes;
-  const opts = { branded };
-  await renderPng(s1x, join(imgDir, `${base}@1x.png`), opts);
-  await renderPng(s2x, join(imgDir, `${base}@2x.png`), opts);
-  // Validator looks for the literal extensionless reference too.
-  await renderPng(s2x, join(imgDir, `${base}.png`), opts);
+function removeIfExists(path) {
+  try { unlinkSync(path); } catch {}
+}
+
+// Plugin icon (color, PNG; required to be PNG by the manifest schema).
+for (const [size, name] of [[72, "plugin-icon@1x.png"], [144, "plugin-icon@2x.png"], [144, "plugin-icon.png"]]) {
+  await renderPng(makeBrandedSvg(size), join(imgDir, name), `${size}px`);
+}
+
+// Action-state (plain black, PNG).
+for (const [size, name] of [[72, "action-state@1x.png"], [144, "action-state@2x.png"], [144, "action-state.png"]]) {
+  await renderPng(makePlainBlackSvg(size), join(imgDir, name), `${size}px plain`);
+}
+
+// Action and category icons — SVG, monochrome white, transparent background.
+// Per https://docs.elgato.com/guidelines/stream-deck/plugins#icons
+writeSvg(makeMonochromeSvg(), join(imgDir, "action-icon.svg"));
+writeSvg(makeMonochromeSvg(), join(imgDir, "category-icon.svg"));
+
+// Clean up any stale PNG variants left over from earlier runs — having both
+// PNG and SVG variants of the same icon makes Stream Deck's resolution
+// ambiguous. SVG wins; remove the PNGs.
+for (const base of ["action-icon", "category-icon"]) {
+  for (const variant of [".png", "@1x.png", "@2x.png"]) {
+    removeIfExists(join(imgDir, `${base}${variant}`));
+  }
 }
 
 // Marketplace listing thumbnail (1920×960, 2:1).
-{
-  const svg = makeBannerSvg(1920, 960);
-  const outPath = join(imgDir, "marketplace-thumbnail.png");
-  await sharp(Buffer.from(svg)).png().toFile(outPath);
-  console.log(`Created marketplace-thumbnail.png (1920×960)`);
-}
+await renderPng(makeBannerSvg(1920, 960), join(imgDir, "marketplace-thumbnail.png"), "1920×960");
 
-console.log("\nDone! Edit PURPLE/BG constants or the SVG in this script to tweak.");
-console.log("Output: com.rtheil.weatherflow.sdPlugin/imgs/");
+console.log("\nDone. Output: com.rtheil.weatherflow.sdPlugin/imgs/");

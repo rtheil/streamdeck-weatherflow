@@ -15,7 +15,7 @@ import {
   kmToMiles,
   mmToIn,
   msToMph,
-  pressureTrendSymbol,
+  pressureTrendLabel,
   StationObservation,
   uvLevel,
 } from "../weatherflow";
@@ -112,10 +112,10 @@ function formatMetric(
         ? hpaToInHg(obs.sea_level_pressure)
         : obs.sea_level_pressure;
       const unit = imperial ? "inHg" : "hPa";
-      const trend = pressureTrendSymbol(obs.pressure_trend);
+      const trend = pressureTrendLabel(obs.pressure_trend);
       return {
         value: `${pressure.toFixed(imperial ? 2 : 0)} ${unit}`,
-        label: `Pressure ${trend}`,
+        label: `Pressure\n${trend}`,
       };
     }
 

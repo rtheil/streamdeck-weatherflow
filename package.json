@@ -10,11 +10,12 @@
     "deploy": "npm run build && node scripts/deploy.js",
     "watch": "rollup -c -w",
     "create-icons": "node scripts/create-icons.js",
+    "compose-screenshots": "node scripts/compose-screenshots.js",
     "validate": "streamdeck validate com.rtheil.weatherflow.sdPlugin",
     "pack": "npm run build && streamdeck pack com.rtheil.weatherflow.sdPlugin --force"
   },
   "dependencies": {
-    "@elgato/streamdeck": "^1.0.0"
+    "@elgato/streamdeck": "^2.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.0",

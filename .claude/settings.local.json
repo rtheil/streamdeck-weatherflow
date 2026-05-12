@@ -24,7 +24,10 @@
       "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" scripts/deploy.js)",
       "Bash(powershell -Command \"Get-ChildItem ''C:\\\\Users\\\\Ricky\\\\AppData\\\\Roaming\\\\Elgato\\\\StreamDeck\\\\logs'' | Sort-Object LastWriteTime -Descending | Select-Object -First 5 | Format-Table Name, LastWriteTime\")",
       "Bash(npx --yes @elgato/cli@latest validate com.ricky.weatherflow.sdPlugin)",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(npx --yes sharp-cli@latest -i screenshots/raw/all-tiles.png metadata)",
+      "Bash(npx --yes sharp-cli@latest -i screenshots/raw/configuration.png metadata)",
+      "Bash(node -e \"import\\('sharp'\\).then\\(async \\({default:sharp}\\)=>{for\\(const f of ['screenshots/raw/all-tiles.png','screenshots/raw/configuration.png']\\){const m=await sharp\\(f\\).metadata\\(\\);console.log\\(f, m.width+'x'+m.height\\);}}\\)\")"
     ]
   }
 }

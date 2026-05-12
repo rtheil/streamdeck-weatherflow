@@ -127,10 +127,10 @@ export function degreesToCompass(deg: number): string {
   return dirs[Math.round(deg / 45) % 8];
 }
 
-export function pressureTrendSymbol(trend: string): string {
-  if (trend === "rising") return "↑";
-  if (trend === "falling") return "↓";
-  return "→";
+export function pressureTrendLabel(trend: string): string {
+  if (trend === "rising") return "rising";
+  if (trend === "falling") return "falling";
+  return "steady";
 }
 
 export function uvLevel(uv: number): string {
