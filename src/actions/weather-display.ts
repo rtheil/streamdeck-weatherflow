@@ -195,8 +195,13 @@ export class WeatherDisplay extends SingletonAction<Settings> {
   /** Called from plugin.ts after global settings (token/station) are updated. */
   async refreshAll(): Promise<void> {
     for (const [, act] of this.activeActions) {
-      const settings = { ...DEFAULT_SETTINGS, ...(await act.getSettings()) } as Settings;
-      await this.updateDisplay(act, settings);
+      try {
+        const settings = { ...DEFAULT_SETTINGS, ...(await act.getSettings()) } as Settings;
+        await this.updateDisplay(act, settings);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        streamDeck.logger.error(`refreshAll iteration failed: ${msg}`);
+      }
     }
   }
 
@@ -221,11 +226,19 @@ export class WeatherDisplay extends SingletonAction<Settings> {
     const intervalMs = intervalMinutes * 60 * 1000;
 
     const timer = setInterval(async () => {
-      const current = {
-        ...DEFAULT_SETTINGS,
-        ...(await act.getSettings()),
-      } as Settings;
-      await this.updateDisplay(act, current);
+      try {
+        const current = {
+          ...DEFAULT_SETTINGS,
+          ...(await act.getSettings()),
+        } as Settings;
+        await this.updateDisplay(act, current);
+      } catch (err) {
+        // An unhandled rejection here would kill subsequent ticks silently
+        // (since v2 of the SDK throws when the action handle is stale).
+        // Log it and let the next tick try again.
+        const msg = err instanceof Error ? err.message : String(err);
+        streamDeck.logger.error(`Refresh tick failed for ${act.id}: ${msg}`);
+      }
     }, intervalMs);
 
     this.timers.set(act.id as string, timer);

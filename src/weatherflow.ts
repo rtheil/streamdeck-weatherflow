@@ -1,5 +1,20 @@
 const BASE_URL = "https://swd.weatherflow.com/swd/rest";
 
+// Wall-clock cap on each HTTP request. Node's built-in fetch has no default
+// timeout — a hung TCP/TLS handshake would otherwise block all subsequent
+// refresh ticks indefinitely.
+const FETCH_TIMEOUT_MS = 15_000;
+
+async function fetchWithTimeout(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export interface StationObservation {
   timestamp: number;
   air_temperature: number;
@@ -67,7 +82,7 @@ export async function getObservations(
   const inflight: Promise<StationObservation> = (async () => {
     try {
       const url = `${BASE_URL}/observations/station/${stationId}?token=${encodeURIComponent(token)}`;
-      const response = await fetch(url);
+      const response = await fetchWithTimeout(url);
 
       if (!response.ok) {
         // On 429 serve stale cache rather than surfacing an error, if available.

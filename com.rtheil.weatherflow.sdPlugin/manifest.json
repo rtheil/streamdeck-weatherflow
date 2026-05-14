@@ -4,7 +4,7 @@
   "Author": "Ricky Theil",
   "Description": "Unofficial plugin for WeatherFlow Tempest weather stations. Display live weather data on Stream Deck buttons.",
   "UUID": "com.rtheil.weatherflow",
-  "Version": "1.0.1.0",
+  "Version": "1.0.3.0",
   "SDKVersion": 3,
   "CodePath": "bin/plugin.js",
   "Icon": "imgs/plugin-icon",

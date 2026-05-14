@@ -1,6 +1,6 @@
 {
   "name": "com.rtheil.weatherflow",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "WeatherFlow Tempest weather station for Stream Deck",
   "author": "Ricky Theil",
   "license": "MIT",
